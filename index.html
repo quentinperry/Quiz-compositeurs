@@ -1,0 +1,1379 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quizz — Les compositeurs classiques</title>
+<style>
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  background: linear-gradient(160deg, #17120e 0%, #2b1f14 55%, #171009 100%);
+  min-height: 100vh;
+  color: #f5efe6;
+}
+
+.quiz-container {
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* === Écran d'accueil === */
+.welcome-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.25rem;
+}
+
+.welcome-icon {
+  font-size: 5rem;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+.welcome-screen h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  font-style: italic;
+  background: linear-gradient(135deg, #e8c47a, #d4a373, #b8860b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.25;
+}
+
+.welcome-screen p {
+  color: #c9b8a3;
+  font-size: 1.05rem;
+  max-width: 430px;
+  line-height: 1.6;
+}
+
+/* === Boîte de configuration === */
+.setup-box {
+  width: 100%;
+  max-width: 440px;
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  text-align: left;
+  padding: 1.5rem;
+  background: rgba(232, 196, 122, 0.05);
+  border: 1px solid rgba(232, 196, 122, 0.18);
+  border-radius: 12px;
+}
+
+.setup-label {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #d4a373;
+  margin-bottom: 0.6rem;
+  display: block;
+}
+
+.choice-row {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.choice-btn {
+  padding: 0.5rem 1rem;
+  font-size: 0.95rem;
+  font-weight: 600;
+  font-family: inherit;
+  color: #e6d9c3;
+  background: rgba(232, 196, 122, 0.04);
+  border: 1.5px solid rgba(232, 196, 122, 0.2);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.choice-btn:hover:not(:disabled) {
+  border-color: #d4a373;
+  background: rgba(212, 163, 115, 0.1);
+  color: #f5efe6;
+}
+
+.choice-btn.selected {
+  border-color: #d4a373;
+  background: rgba(212, 163, 115, 0.18);
+  color: #e8c47a;
+  box-shadow: 0 0 12px rgba(212, 163, 115, 0.25);
+}
+
+.choice-btn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.start-btn {
+  margin-top: 0.5rem;
+  padding: 0.9rem 2.5rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  font-style: italic;
+  font-family: inherit;
+  color: #17120e;
+  background: linear-gradient(135deg, #e8c47a, #d4a373);
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 8px 30px rgba(212, 163, 115, 0.35);
+}
+
+.start-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px rgba(212, 163, 115, 0.5);
+}
+
+.start-btn:active {
+  transform: translateY(0);
+}
+
+/* === Barre de progression === */
+.progress-bar-wrap {
+  margin-bottom: 1.5rem;
+}
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  font-size: 0.95rem;
+  color: #c9b8a3;
+}
+
+.progress-track {
+  height: 6px;
+  background: rgba(232, 196, 122, 0.1);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #b8860b, #e8c47a);
+  border-radius: 999px;
+  transition: width 0.4s ease;
+}
+
+/* === Carte question === */
+.question-card {
+  background: rgba(232, 196, 122, 0.045);
+  border: 1px solid rgba(232, 196, 122, 0.15);
+  border-radius: 12px;
+  padding: 1.75rem;
+}
+
+.question-header {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin-bottom: 1rem;
+}
+
+.q-number {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: #e8c47a;
+  background: rgba(232, 196, 122, 0.12);
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+}
+
+.q-difficulty {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  border: 1px solid;
+}
+
+.question-text {
+  font-size: 1.35rem;
+  font-weight: 700;
+  font-style: italic;
+  line-height: 1.35;
+  margin-bottom: 1.25rem;
+  color: #faf6ef;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.option-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: 100%;
+  padding: 0.85rem 1rem;
+  font-size: 1.02rem;
+  font-family: inherit;
+  font-weight: 500;
+  text-align: left;
+  color: #e6d9c3;
+  background: rgba(232, 196, 122, 0.04);
+  border: 1.5px solid rgba(232, 196, 122, 0.18);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  line-height: 1.4;
+}
+
+.option-btn:hover:not(:disabled) {
+  border-color: #d4a373;
+  background: rgba(212, 163, 115, 0.1);
+  color: #f5efe6;
+}
+
+.option-btn.selected-correct {
+  border-color: #7cb342;
+  background: rgba(124, 179, 66, 0.12);
+  color: #c5e1a5;
+}
+
+.option-btn.selected-wrong {
+  border-color: #cd5c5c;
+  background: rgba(205, 92, 92, 0.12);
+  color: #f1b8b8;
+}
+
+.option-btn:disabled {
+  cursor: default;
+}
+
+.option-letter {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 700;
+  border-radius: 50%;
+  background: rgba(232, 196, 122, 0.08);
+  border: 1px solid rgba(232, 196, 122, 0.2);
+}
+
+.selected-correct .option-letter {
+  background: rgba(124, 179, 66, 0.2);
+  border-color: #7cb342;
+  color: #c5e1a5;
+}
+
+.selected-wrong .option-letter {
+  background: rgba(205, 92, 92, 0.2);
+  border-color: #cd5c5c;
+  color: #f1b8b8;
+}
+
+/* === Explication === */
+.explanation-box {
+  margin-top: 1.25rem;
+  padding: 1rem 1.25rem;
+  border-radius: 8px;
+  background: rgba(212, 163, 115, 0.08);
+  border: 1px solid rgba(212, 163, 115, 0.22);
+  border-left: 3px solid #d4a373;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.explanation-box .expl-label {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #d4a373;
+  margin-bottom: 0.4rem;
+}
+
+.explanation-box p {
+  font-size: 0.98rem;
+  line-height: 1.6;
+  color: #e6d9c3;
+}
+
+.next-btn {
+  margin-top: 1.25rem;
+  width: 100%;
+  padding: 0.85rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-style: italic;
+  font-family: inherit;
+  color: #17120e;
+  background: linear-gradient(135deg, #e8c47a, #d4a373);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.next-btn:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* === Écran de résultat === */
+.result-screen {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: 1.25rem;
+}
+
+.result-emoji {
+  font-size: 5rem;
+  animation: popIn 0.5s ease;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); }
+}
+
+.result-screen h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  font-style: italic;
+  color: #faf6ef;
+}
+
+.score-circle {
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 4px solid;
+  position: relative;
+}
+
+.score-circle .score-num {
+  font-size: 2.5rem;
+  font-weight: 800;
+  line-height: 1;
+}
+
+.score-circle .score-denom {
+  font-size: 1rem;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.result-message {
+  color: #c9b8a3;
+  font-size: 1.05rem;
+  max-width: 420px;
+  line-height: 1.6;
+}
+
+.result-details {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 0.5rem;
+}
+
+.result-stat {
+  text-align: center;
+}
+
+.result-stat .stat-num {
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #faf6ef;
+}
+
+.result-stat .stat-label {
+  font-size: 0.85rem;
+  color: #a08d76;
+}
+
+.restart-btn {
+  margin-top: 0.75rem;
+  padding: 0.85rem 2rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  font-family: inherit;
+  color: #e6d9c3;
+  background: rgba(232, 196, 122, 0.06);
+  border: 1.5px solid rgba(232, 196, 122, 0.25);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.restart-btn:hover {
+  background: rgba(232, 196, 122, 0.12);
+  border-color: rgba(232, 196, 122, 0.4);
+  color: #faf6ef;
+}
+
+/* Responsive */
+@media (max-width: 480px) {
+  .welcome-screen h1 { font-size: 1.6rem; }
+  .question-text { font-size: 1.15rem; }
+  .option-btn { font-size: 0.92rem; padding: 0.75rem 0.85rem; }
+}
+
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const QUESTIONS = [
+  // ─── Niveau facile ───
+  {
+    id: 1,
+    question: "Qui a composé la 5e Symphonie, dite « du Destin », avec son célèbre motif à quatre notes ?",
+    options: [
+      "Joseph Haydn",
+      "Ludwig van Beethoven",
+      "Johannes Brahms",
+      "Anton Bruckner"
+    ],
+    correctIndex: 1,
+    explanation: "Composée entre 1804 et 1808, la 5e Symphonie de Beethoven s'ouvre sur le fameux « ta-ta-ta-taaa », sans doute le motif le plus célèbre de la musique occidentale. Beethoven était alors déjà atteint de surdité.",
+    difficulty: "facile"
+  },
+  {
+    id: 2,
+    question: "Le Lac des cygnes et Casse-Noisette sont des ballets de… ?",
+    options: [
+      "Igor Stravinski",
+      "Sergueï Prokofiev",
+      "Piotr Ilitch Tchaïkovski",
+      "Maurice Ravel"
+    ],
+    correctIndex: 2,
+    explanation: "Tchaïkovski a composé trois grands ballets : Le Lac des cygnes (1877), La Belle au bois dormant (1890) et Casse-Noisette (1892), dont est tirée la célèbre « Danse de la fée Dragée ».",
+    difficulty: "facile"
+  },
+  {
+    id: 3,
+    question: "Qui a composé Les Quatre Saisons ?",
+    options: [
+      "Antonio Vivaldi",
+      "Jean-Sébastien Bach",
+      "Georg Friedrich Haendel",
+      "Domenico Scarlatti"
+    ],
+    correctIndex: 0,
+    explanation: "Vivaldi a publié Les Quatre Saisons vers 1725 : quatre concertos pour violon (« Le Printemps », « L'Été », « L'Automne », « L'Hiver »), accompagnés de sonnets descriptifs. C'est l'un des chefs-d'œuvre du baroque vénitien.",
+    difficulty: "facile"
+  },
+  {
+    id: 4,
+    question: "L'opéra Carmen, avec son irrésistible « Habanera », est l'œuvre de… ?",
+    options: [
+      "Charles Gounod",
+      "Jacques Offenbach",
+      "Hector Berlioz",
+      "Georges Bizet"
+    ],
+    correctIndex: 3,
+    explanation: "Carmen (1875) de Bizet raconte la passion destructrice de Don José pour la cigarière Carmen. L'opéra fut fraîchement accueilli à sa création — Bizet est mort trois mois après, sans connaître son immense succès posthume.",
+    difficulty: "facile"
+  },
+  {
+    id: 5,
+    question: "Qui a composé la sérénade Une petite musique de nuit (Eine kleine Nachtmusik) ?",
+    options: [
+      "Wolfgang Amadeus Mozart",
+      "Franz Schubert",
+      "Joseph Haydn",
+      "Carl Maria von Weber"
+    ],
+    correctIndex: 0,
+    explanation: "Mozart a composé cette sérénade pour cordes en 1787 à Vienne. C'est aujourd'hui l'une de ses œuvres les plus jouées et reconnues — le « jingle » du classicisme viennois.",
+    difficulty: "facile"
+  },
+  {
+    id: 6,
+    question: "Le célèbre « Clair de lune » (Suite bergamasque) a été composé par… ?",
+    options: [
+      "Gabriel Fauré",
+      "Claude Debussy",
+      "Maurice Ravel",
+      "Erik Satie"
+    ],
+    correctIndex: 1,
+    explanation: "« Clair de lune » est le troisième mouvement de la Suite bergamasque de Debussy, publiée en 1905. Ce morceau pour piano est l'un des plus connus du compositeur français, emblème de l'impressionnisme musical.",
+    difficulty: "facile"
+  },
+  {
+    id: 7,
+    question: "Le spectaculaire « Vol du bourdon » est un interlude de l'opéra… ?",
+    options: [
+      "Le Conte du tsar Saltan, de Nikolaï Rimski-Korsakov",
+      "Sadko, de Nikolaï Rimski-Korsakov",
+      "La Khovantchina, de Modeste Moussorgski",
+      "Boris Godounov, de Modeste Moussorgski"
+    ],
+    correctIndex: 0,
+    explanation: "Le « Vol du bourdon » provient du Conte du tsar Saltan (1900) de Rimski-Korsakov : il illustre le vol magique du prince changé en bourdon. Ses gammes chromatiques en fusée en font un défi de virtuosité, surtout au violon.",
+    difficulty: "facile"
+  },
+  {
+    id: 8,
+    question: "Qui a composé Le Carnaval des animaux, avec son très majestueux « Cygne » ?",
+    options: [
+      "Camille Saint-Saëns",
+      "Hector Berlioz",
+      "Emmanuel Chabrier",
+      "Léo Delibes"
+    ],
+    correctIndex: 0,
+    explanation: "Saint-Saëns a composé cette fantaisie zoologique en 1886 pour amuser ses amis. Il n'en autorisa la publication intégrale qu'après sa mort, craignant qu'elle nuise à son image de compositeur sérieux — seul « Le Cygne » fut édité de son vivant.",
+    difficulty: "facile"
+  },
+  {
+    id: 9,
+    question: "Le Boléro, unique mouvement d'orchestre répété en crescendo pendant quinze minutes, est de… ?",
+    options: [
+      "Emmanuel Chabrier",
+      "Maurice Ravel",
+      "Claude Debussy",
+      "Igor Stravinski"
+    ],
+    correctIndex: 1,
+    explanation: "Commandé comme ballet par Ida Rubinstein, le Boléro (1928) de Ravel repose sur deux mélodies répétées sur un ostinato de tambour, avec une orchestration qui s'amplifie jusqu'au tumulte final. Un tour de force d'orchestration.",
+    difficulty: "facile"
+  },
+  {
+    id: 10,
+    question: "La « Chevauchée des Walkyries » est extraite de… ?",
+    options: [
+      "Lohengrin, de Richard Wagner",
+      "Tristan et Isolde, de Richard Wagner",
+      "L'Anneau du Nibelung, de Richard Wagner",
+      "Parsifal, de Richard Wagner"
+    ],
+    correctIndex: 2,
+    explanation: "La « Walkürenritt » ouvre le troisième acte de La Walkyrie, deuxième journée de la tétralogie L'Anneau du Nibelung de Wagner. Les Walkyries sont des vierges guerrières qui emportent les héros morts au Valhalla.",
+    difficulty: "facile"
+  },
+  {
+    id: 11,
+    question: "Frédéric Chopin, surnommé « le poète du piano », reste indissociable de quel instrument ?",
+    options: [
+      "le violon",
+      "le piano",
+      "le violoncelle",
+      "l'orgue"
+    ],
+    correctIndex: 1,
+    explanation: "Presque toute l'œuvre de Chopin est dédiée au piano : nocturnes, ballades, études, mazurkas et polonaises. Né près de Varsovie, il s'installe à Paris en 1831 et devient la figure centrale du romantisme pianistique.",
+    difficulty: "facile"
+  },
+  {
+    id: 12,
+    question: "Frédéric Chopin était de quelle nationalité ?",
+    options: [
+      "Française",
+      "Russe",
+      "Polonaise",
+      "Allemande"
+    ],
+    correctIndex: 2,
+    explanation: "Né à Żelazowa Wola près de Varsovie en 1810, d'un père français et d'une mère polonaise, Chopin est revendiqué comme le grand compositeur national de la Pologne — ses mazurkas et polonaises portent la voix du pays alors partagé entre empires.",
+    difficulty: "facile"
+  },
+  {
+    id: 13,
+    question: "Qui a composé la musique de scène Peer Gynt, avec « Dans la grotte du roi de la montagne » ?",
+    options: [
+      "Edvard Grieg",
+      "Jean Sibelius",
+      "Carl Nielsen",
+      "Niels Gade"
+    ],
+    correctIndex: 0,
+    explanation: "Grieg, le plus grand compositeur norvégien, a écrit en 1875 cette musique pour le drame d'Henrik Ibsen. « Dans la grotte du roi de la montagne » et « Matin » sont devenues deux tubes universels du répertoire.",
+    difficulty: "facile"
+  },
+  {
+    id: 14,
+    question: "La Traviata et Aïda sont des opéras de… ?",
+    options: [
+      "Giacomo Puccini",
+      "Gioachino Rossini",
+      "Gaetano Donizetti",
+      "Giuseppe Verdi"
+    ],
+    correctIndex: 3,
+    explanation: "Verdi a dominé l'opéra italien du XIXe siècle avec Rigoletto, La Traviata, Aïda, Otello, Falstaff… Ses mélodies et son sens du théâtre ont fait de lui le compositeur le plus joué des opéras italiens aux côtés de Puccini.",
+    difficulty: "facile"
+  },
+
+  // ─── Niveau moyen ───
+  {
+    id: 15,
+    question: "Qui a composé la Symphonie fantastique, récit orchestral d'une passion obsessionnelle ?",
+    options: [
+      "Camille Saint-Saëns",
+      "Hector Berlioz",
+      "César Franck",
+      "Georges Bizet"
+    ],
+    correctIndex: 1,
+    explanation: "Berlioz a composé cette symphonie-programme en 1830, inspirée par son amour (non partagé) pour l'actrice Harriet Smithson. Elle utilise l'« idée fixe », motif récurrent qui symbolise l'être aimé — une innovation majeure de la musique romantique.",
+    difficulty: "moyen"
+  },
+  {
+    id: 16,
+    question: "Quel compositeur, mort à 31 ans, a laissé plus de 600 lied (chants) pour voix et piano ?",
+    options: [
+      "Robert Schumann",
+      "Felix Mendelssohn",
+      "Franz Schubert",
+      "Hugo Wolf"
+    ],
+    correctIndex: 2,
+    explanation: "Schubert est le maître incontesté du lied : plus de 600 mélodies, dont le cycle La Belle Meunière et le quintette « La Truite ». « Der Erlkönig » (Le Roi des aulnes), écrit à 18 ans, reste un sommet du genre.",
+    difficulty: "moyen"
+  },
+  {
+    id: 17,
+    question: "Qui a composé la Symphonie « du Nouveau Monde », n°9, très influencée par les mélodies américaines et tchèques ?",
+    options: [
+      "Antonín Dvořák",
+      "Bedřich Smetana",
+      "Leoš Janáček",
+      "Béla Bartók"
+    ],
+    correctIndex: 0,
+    explanation: "Dvořák a composé cette symphonie en 1893, alors directeur du Conservatoire de New York. Il y intègre des sonorités inspirées des chants spirituels afro-américains et amérindiens, avec une profonde nostalgie de sa Bohême natale.",
+    difficulty: "moyen"
+  },
+  {
+    id: 18,
+    question: "Qui a composé les Gymnopédies, pièces lentes et suspendues pour piano ?",
+    options: [
+      "Erik Satie",
+      "Claude Debussy",
+      "Maurice Ravel",
+      "Francis Poulenc"
+    ],
+    correctIndex: 0,
+    explanation: "Erik Satie a composé les trois Gymnopédies en 1888. Lents, dépouillés, presque hypnotiques, ces morceaux préfigurent l'ambiance de la future « musique d'ameublement » de Satie et inspireront Debussy, qui les orchestra.",
+    difficulty: "moyen"
+  },
+  {
+    id: 19,
+    question: "Qui a composé les opéras Tosca, La Bohème et Madame Butterfly ?",
+    options: [
+      "Giuseppe Verdi",
+      "Giacomo Puccini",
+      "Vincenzo Bellini",
+      "Pietro Mascagni"
+    ],
+    correctIndex: 1,
+    explanation: "Puccini (1858-1924) est le dernier grand maître de l'opéra italien. Ses héroïnes tragiques (Tosca, Mimì, Cio-Cio-San) et son art de la mélodie au service du drame font de lui l'un des compositeurs d'opéra les plus joués au monde.",
+    difficulty: "moyen"
+  },
+  {
+    id: 20,
+    question: "Qui a composé la Symphonie n°94, dite « Surprise », et mérite le surnom de « père de la symphonie » ?",
+    options: [
+      "Wolfgang Amadeus Mozart",
+      "Ludwig van Beethoven",
+      "Joseph Haydn",
+      "Johann Stamitz"
+    ],
+    correctIndex: 2,
+    explanation: "Haydn a composé plus de 100 symphonies, fixant la forme pour ceux qui viendront. La « Surprise » (1791) doit son nom au coup de timbales inattendu dans le mouvement lent, destiné à réveiller un public assoupi — Haydn avait le sens de l'humour.",
+    difficulty: "moyen"
+  },
+  {
+    id: 21,
+    question: "Qui a composé Le Clavier bien tempéré, recueil de 48 préludes et fugues ?",
+    options: [
+      "Georg Friedrich Haendel",
+      "Domenico Scarlatti",
+      "Jean-Sébastien Bach",
+      "Carl Philipp Emanuel Bach"
+    ],
+    correctIndex: 2,
+    explanation: "Bach a composé ces préludes et fugues dans les 24 tonalités majeures et mineures (deux livres). L'œuvre, « pour l'utilité et l'agrément des jeunes musiciens », reste la référence absolue du contrepoint et un monument intellectuel et musical.",
+    difficulty: "moyen"
+  },
+  {
+    id: 22,
+    question: "Qui a composé l'oratorio Le Messie, avec le fameux « Alléluia » ?",
+    options: [
+      "Georg Friedrich Haendel",
+      "Jean-Sébastien Bach",
+      "Antonio Vivaldi",
+      "Heinrich Schütz"
+    ],
+    correctIndex: 0,
+    explanation: "Haendel, allemand naturalisé anglais, a composé Le Messie en 1741 en 24 jours. Le « Alléluia » du chœur final est si majestueux que la tradition veut que le roi George II se soit levé — d'où l'usage de se tenir debout pendant ce passage.",
+    difficulty: "moyen"
+  },
+  {
+    id: 23,
+    question: "Qui a composé L'Orfeo, considéré comme l'un des tout premiers opéras de l'histoire ?",
+    options: [
+      "Jacopo Peri",
+      "Claudio Monteverdi",
+      "Heinrich Schütz",
+      "Alessandro Scarlatti"
+    ],
+    correctIndex: 1,
+    explanation: "Monteverdi a composé L'Orfeo en 1607 pour la cour de Mantoue. Là où Peri avait expérimenté la monodie, Monteverdi lui donne la richesse instrumentale et dramatique qui fonde le répertoire lyrique — l'opéra était né.",
+    difficulty: "moyen"
+  },
+  {
+    id: 24,
+    question: "Clara Wieck, virtuose adulée du XIXe siècle, était l'épouse de quel compositeur ?",
+    options: [
+      "Johannes Brahms",
+      "Robert Schumann",
+      "Felix Mendelssohn",
+      "Frédéric Chopin"
+    ],
+    correctIndex: 1,
+    explanation: "Clara Schumann (1819-1896) fut l'une des plus grandes pianistes de son siècle et une compositrice à part entière. Épouse de Robert Schumann, elle fut aussi l'inspiratrice et l'amie très proche de Brahms, et défendit l'œuvre de son mari après sa mort.",
+    difficulty: "moyen"
+  },
+  {
+    id: 25,
+    question: "Quel compositeur est connu pour ses symphonies d'envergure monumentale, dont l'une exige plus de 1 000 musiciens à sa création ?",
+    options: [
+      "Anton Bruckner",
+      "Gustav Mahler",
+      "Richard Strauss",
+      "Hans Rott"
+    ],
+    correctIndex: 1,
+    explanation: "Mahler a composé des symphonies-cosmos, dont la 8e dite « des Mille » (1910) : chorales immenses et orchestre démesuré. « La symphonie doit être comme le monde, elle doit tout contenir », disait-il. Ses œuvres sont les piliers du répertoire symphonique moderne.",
+    difficulty: "moyen"
+  },
+  {
+    id: 26,
+    question: "Qui a composé le Prélude à l'après-midi d'un faune, ouverture du modernisme musical ?",
+    options: [
+      "Maurice Ravel",
+      "Claude Debussy",
+      "Erik Satie",
+      "Gabriel Fauré"
+    ],
+    correctIndex: 1,
+    explanation: "Composé en 1894 d'après le poème de Mallarmé, ce prélude pour orchestre ouvre la porte à une musique de timbres et de sensations plutôt que de structure — Pierre Boulez le considérait comme le début de la musique moderne.",
+    difficulty: "moyen"
+  },
+  {
+    id: 27,
+    question: "Qui a composé le poème symphonique Finlandia, symbole de la résistance nationale finlandaise ?",
+    options: [
+      "Edvard Grieg",
+      "Carl Nielsen",
+      "Jean Sibelius",
+      "Einojuhani Rautavaara"
+    ],
+    correctIndex: 2,
+    explanation: "Sibelius (1865-1957) est le héros musical de la Finlande. Finlandia (1899), écrit sous l'oppression russe, est devenu un hymne de la fierté nationale. Son Concerto pour violon et ses symphonies sont parmi les plus joués du XXe siècle.",
+    difficulty: "moyen"
+  },
+  {
+    id: 28,
+    question: "Qui a composé Le Barbier de Séville, comédie lyrique enchanteresse de 1816 ?",
+    options: [
+      "Gioachino Rossini",
+      "Gaetano Donizetti",
+      "Vincenzo Bellini",
+      "Giuseppe Verdi"
+    ],
+    correctIndex: 0,
+    explanation: "Rossini a composé ce chef-d'œuvre bouffe en quelques semaines à 24 ans. Figaro y chante son fameux « Largo al factotum » (« Faites place au factotum ! »). Rossini, star de son temps, prit sa retraite de compositeur d'opéra à 37 ans.",
+    difficulty: "moyen"
+  },
+  {
+    id: 29,
+    question: "Qui a composé la Pavane pour une infante défunte, poème rêveur pour piano, orchestré plus tard ?",
+    options: [
+      "Claude Debussy",
+      "Maurice Ravel",
+      "Erik Satie",
+      "Albert Roussel"
+    ],
+    correctIndex: 1,
+    explanation: "Ravel a composé cette pavane en 1899, inspiré par la poésie de l'Espagne classique. Le titre, purement évocateur, est un exercice de style sur la sonorité plus qu'un hommage à une vraie infante. L'orchestration en 1910 en fit un succès international.",
+    difficulty: "moyen"
+  },
+  {
+    id: 30,
+    question: "Qui est l'inventeur du récital de piano moderne et du poème symphonique ?",
+    options: [
+      "Franz Liszt",
+      "Frédéric Chopin",
+      "Sigismond Thalberg",
+      "Hans von Bülow"
+    ],
+    correctIndex: 0,
+    explanation: "Franz Liszt (1811-1886) fut le virtuose le plus fêté de son siècle : il donna l'un des premiers récitals solo de l'histoire, jouant de mémoire. Il inventa aussi le poème symphonique (Les Préludes, Mazeppa), libérant la musique de la forme classique.",
+    difficulty: "moyen"
+  },
+  {
+    id: 31,
+    question: "Quel compositeur a conçu la notion de « Gesamtkunstwerk » (œuvre d'art totale) et fait construire son propre théâtre à Bayreuth ?",
+    options: [
+      "Giuseppe Verdi",
+      "Richard Wagner",
+      "Hector Berlioz",
+      "Gioachino Rossini"
+    ],
+    correctIndex: 1,
+    explanation: "Wagner (1813-1883) voulait fusionner musique, poésie, théâtre et mise en scène. Il fit construire le Festspielhaus de Bayreuth, conçu pour son idéal acoustique, où l'on ne joue encore aujourd'hui presque que ses opéras.",
+    difficulty: "moyen"
+  },
+  {
+    id: 32,
+    question: "Qui a composé la Rhapsody in Blue, fusion de jazz et de musique classique ?",
+    options: [
+      "Aaron Copland",
+      "George Gershwin",
+      "Leonard Bernstein",
+      "Duke Ellington"
+    ],
+    correctIndex: 1,
+    explanation: "Gershwin (1898-1937) a composé la Rhapsody in Blue en 1924, sur commande du chef Paul Whiteman. Solo de piano, orchestre, bleus et rythmes jazz : c'est le pont parfait entre la tradition européenne et l'Amérique du jazz.",
+    difficulty: "moyen"
+  },
+  {
+    id: 33,
+    question: "Quel compositeur a défendu la « musique absolue » (pure, sans programme), contre le modernisme de Liszt et Wagner ?",
+    options: [
+      "Richard Wagner",
+      "Johannes Brahms",
+      "Franz Liszt",
+      "Hector Berlioz"
+    ],
+    correctIndex: 1,
+    explanation: "Au XIXe siècle, deux camps se sont affrontés : la « musique de l'avenir » de Liszt et Wagner, programmatique, contre la musique absolue de Brahms, héritier de Beethoven. Cette querelle a structuré la vie musicale allemande pendant des décennies.",
+    difficulty: "moyen"
+  },
+  {
+    id: 34,
+    question: "Quel violoniste virtuose a composé les 24 Caprices, si difficiles qu'on l'a longtemps cru possédé par le diable ?",
+    options: [
+      "Niccolò Paganini",
+      "Pablo de Sarasate",
+      "Joseph Joachim",
+      "Henri Vieuxtemps"
+    ],
+    correctIndex: 0,
+    explanation: "Paganini (1782-1840) a révolutionné le violon avec des techniques inédites. Sa légende « diabolique » — il aurait vendu son âme — nourrit le mythe du virtuose maudit, et inspire encore les compositeurs, de Schumann à Rachmaninov.",
+    difficulty: "moyen"
+  },
+
+  // ─── Niveau difficile ───
+  {
+    id: 35,
+    question: "La création du Sacre du printemps, en 1913 à Paris, a provoqué… ?",
+    options: [
+      "Un enthousiasme unanime du public",
+      "Une émeute dans la salle, l'un des plus fameux scandales de l'histoire de la musique",
+      "Une interdiction immédiate par la censure",
+      "Le départ de Stravinski pour l'Amérique"
+    ],
+    correctIndex: 1,
+    explanation: "Le Sacre du printemps de Stravinski, chorégraphié par Nijinski, a déclenché le 29 mai 1913 au Théâtre des Champs-Élysées l'un des plus fameux scandales de l'histoire de la musique : huées, échanges d'injures et même coups — la police est intervenue. L'œuvre est aujourd'hui un pilier du XXe siècle.",
+    difficulty: "difficile"
+  },
+  {
+    id: 36,
+    question: "Qui a inventé le système dodécaphonique, méthode de composition avec les douze sons de la gamme, sans hiérarchie tonale ?",
+    options: [
+      "Arnold Schoenberg",
+      "Anton Webern",
+      "Igor Stravinski",
+      "Olivier Messiaen"
+    ],
+    correctIndex: 0,
+    explanation: "Schoenberg (1874-1951) a formalisé dans les années 1920 la composition avec douze sons, pour « libérer la dissonance ». Avec ses élèves Berg et Webern, il forme l'École de Vienne, qui a ouvert la voie à la musique contemporaine.",
+    difficulty: "difficile"
+  },
+  {
+    id: 37,
+    question: "Qui a composé le Quatuor pour la fin du temps, créé en 1941 dans un camp de prisonniers en Silésie ?",
+    options: [
+      "Dmitri Chostakovitch",
+      "Olivier Messiaen",
+      "Bohuslav Martinů",
+      "Béla Bartók"
+    ],
+    correctIndex: 1,
+    explanation: "Messiaen, prisonnier de guerre, a composé ce quatuor pour les instruments disponibles (piano, clarinette, violon, violoncelle) et l'a créé devant ses codétenus et gardiens. Il y développe ses modes à transpositions limitées et son amour du chant des oiseaux — deux marques de son langage unique.",
+    difficulty: "difficile"
+  },
+  {
+    id: 38,
+    question: "Quel compositeur a aussi été un ethnomusicologue pionnier, enregistrant des chants paysans en Hongrie et Roumanie ?",
+    options: [
+      "Zoltán Kodály",
+      "Béla Bartók",
+      "Leoš Janáček",
+      "György Ligeti"
+    ],
+    correctIndex: 1,
+    explanation: "Bartók (1881-1945) a parcouru les campagnes avec un phonographe pour collecter des milliers de chants traditionnels. Cette recherche nourrit sa musique (Mikrokosmos, Concerto pour orchestre) et fonde l'ethnomusicologie moderne, souvent aux côtés de son compatriote Kodály.",
+    difficulty: "difficile"
+  },
+  {
+    id: 39,
+    question: "Qui était la compositrice mystique bénédictine du XIIe siècle, auteur de visions prophétiques et de chants liturgiques ?",
+    options: [
+      "Hildegard von Bingen",
+      "Chiara Margarita Cozzolani",
+      "Barbara Strozzi",
+      "Élisabeth Jacquet de La Guerre"
+    ],
+    correctIndex: 0,
+    explanation: "Hildegard (1098-1179), abbesse visionnaire, a composé un corpus unique de chants pour son couvent. Redécouverte au XXe siècle, elle est aujourd'hui considérée comme la première compositrice connue de l'histoire de la musique occidentale.",
+    difficulty: "difficile"
+  },
+  {
+    id: 40,
+    question: "La sœur de Felix Mendelssohn, compositrice talentueuse, s'appelait… ?",
+    options: [
+      "Clara Mendelssohn",
+      "Fanny Mendelssohn",
+      "Nannerl Mendelssohn",
+      "Rebecca Mendelssohn"
+    ],
+    correctIndex: 1,
+    explanation: "Fanny Mendelssohn (1805-1847) a composé plus de 400 œuvres, dont des Lieder publiés de son vivant… parfois sous le nom de son frère. L'anecdote célèbre : la reine Victoria, croyant chanter un lied de Felix, chantait en réalité une mélodie de Fanny.",
+    difficulty: "difficile"
+  },
+  {
+    id: 41,
+    question: "Antonio Vivaldi portait le surnom de… ?",
+    options: [
+      "il Prete Rosso (le prêtre roux)",
+      "il Divino Claudio",
+      "il Padre della sinfonia",
+      "il Veneziano"
+    ],
+    correctIndex: 0,
+    explanation: "Vivaldi était prêtre — et roux. Surnommé « il Prete Rosso », il enseigna au pensionnat de l'Ospedale della Pietà à Venise, institution pour filles orphelines dont l'orchestre devint légendaire, et pour laquelle il écrivit une grande partie de ses concertos.",
+    difficulty: "difficile"
+  },
+  {
+    id: 42,
+    question: "Quelle écrivaine fut la compagne de Chopin pendant près de dix ans, lui inspirant notamment son hiver à Majorque ?",
+    options: [
+      "George Sand",
+      "Marie d'Agoult",
+      "Eugénie de Guérin",
+      "Delphine de Girardin"
+    ],
+    correctIndex: 0,
+    explanation: "George Sand (nom de plume d'Amantine Dupin) et Chopin vécurent ensemble de 1838 à 1847. Leur hiver à Majorque, dans la chartreuse de Valldemossa, a inspiré les 24 Préludes de Chopin — écrits en partie sur le piano rapporté de Paris.",
+    difficulty: "difficile"
+  },
+  {
+    id: 43,
+    question: "Quelle riche veuve a financé Tchaïkovski pendant treize ans… sans jamais le rencontrer ?",
+    options: [
+      "Nadejda von Meck",
+      "Anna Dostoïevskaïa",
+      "Mathilde Kschessinska",
+      "Alexandra Tolstaïa"
+    ],
+    correctIndex: 0,
+    explanation: "Nadejda von Meck, veuve d'un magnat des chemins de fer, a versé à Tchaïkovski une pension pendant treize ans, à la condition stricte de ne jamais se rencontrer. Ils ont échangé plus de 1 000 lettres — l'un des plus étranges et touchants mécénats de l'histoire de la musique.",
+    difficulty: "difficile"
+  },
+  {
+    id: 44,
+    question: "Dans quel opéra de Verdi entend-on le chœur « Va, pensiero », devenu hymne patriotique italien ?",
+    options: [
+      "Nabucco",
+      "Aïda",
+      "I Lombardi",
+      "La forza del destino"
+    ],
+    correctIndex: 0,
+    explanation: "« Va, pensiero » (1842) est le chœur des esclaves hébreux exilés à Babylone dans Nabucco. Les Italiens, alors sous domination autrichienne, y ont entendu l'écho de leur aspiration à l'indépendance — le morceau a pris une dimension politique durable.",
+    difficulty: "difficile"
+  },
+  {
+    id: 45,
+    question: "Anton Bruckner, compositeur de symphonies colossales, exerçait principalement le métier de… ?",
+    options: [
+      "Chef d'orchestre",
+      "Organiste",
+      "Professeur de violon",
+      "Maître de chapelle à la cour"
+    ],
+    correctIndex: 1,
+    explanation: "Bruckner (1824-1896) fut organiste à l'abbaye de Saint-Florian puis à Vienne, admiré comme improvisateur légendaire. Ses symphonies, longtemps incomprises, sont aujourd'hui reconnues comme des cathédrales sonores — et l'Adagio de sa 7e est l'un des sommets du répertoire.",
+    difficulty: "difficile"
+  },
+  {
+    id: 46,
+    question: "César Franck, figure tutélaire de la musique française, était en réalité de quelle nationalité ?",
+    options: [
+      "Française",
+      "Belge",
+      "Suisse",
+      "Luxembourgeoise"
+    ],
+    correctIndex: 1,
+    explanation: "Né à Liège en 1822, César Franck est naturalisé français à 32 ans. Organiste à Sainte-Clotilde à Paris, professeur au Conservatoire, il a formé toute une génération (d'Indy, Chausson, Vierne) et imposé la musique cyclique. La France l'a adopté comme l'un des siens.",
+    difficulty: "difficile"
+  },
+  {
+    id: 47,
+    question: "Qui a composé l'opéra Wozzeck, premier grand chef-d'œuvre atonal monté à l'opéra ?",
+    options: [
+      "Alban Berg",
+      "Arnold Schoenberg",
+      "Anton Webern",
+      "Kurt Weill"
+    ],
+    correctIndex: 0,
+    explanation: "Berg (1885-1935), élève de Schoenberg, a tiré de la pièce de Büchner un opéra bouleversant, créé à Berlin en 1925. Fusion du langage atonal et du théâtre réaliste, Wozzeck est aujourd'hui reconnu comme l'un des sommets de l'opéra du XXe siècle.",
+    difficulty: "difficile"
+  },
+  {
+    id: 48,
+    question: "Quel compositeur baroque français a publié en 1722 le Traité de l'harmonie, fondement théorique de l'harmonie classique ?",
+    options: [
+      "Jean-Philippe Rameau",
+      "François Couperin",
+      "Marc-Antoine Charpentier",
+      "Michel-Richard de Lalande"
+    ],
+    correctIndex: 0,
+    explanation: "Rameau (1683-1764) a révolutionné la théorie musicale en montrant que les accords s'organisent selon des règles physiques et mathématiques. Son Traité de l'harmonie réduite à ses principes naturels est devenu la bible de l'harmonie — et il était aussi un grand compositeur d'opéras.",
+    difficulty: "difficile"
+  },
+  {
+    id: 49,
+    question: "Parmi ces compositeurs, lequel est né le plus récemment ?",
+    options: [
+      "Gioachino Rossini",
+      "Hector Berlioz",
+      "Franz Liszt",
+      "Richard Wagner"
+    ],
+    correctIndex: 3,
+    explanation: "Wagner est né le 22 mai 1813, tout comme Verdi quelques mois plus tôt — l'année 1813 est l'une des plus fabuleuses de l'histoire de l'opéra. Rossini est de 1792, Berlioz de 1803 et Liszt de 1811 : Wagner est donc le plus jeune des quatre.",
+    difficulty: "moyen"
+  },
+  {
+    id: 50,
+    question: "Classez ces compositeurs du plus anciennement né au plus récemment né :",
+    options: [
+      "Bach (1685) → Haendel (1685) → Mozart (1756) → Beethoven (1770)",
+      "Mozart (1756) → Bach (1685) → Haendel (1685) → Beethoven (1770)",
+      "Haendel (1685) → Bach (1685) → Beethoven (1770) → Mozart (1756)",
+      "Beethoven (1770) → Mozart (1756) → Haendel (1685) → Bach (1685)"
+    ],
+    correctIndex: 0,
+    explanation: "Bach et Haendel sont nés la même année, 1685 (Haendel en février, Bach en mars). Viennent ensuite Mozart (1756) puis Beethoven (1770). Ce sont les quatre géants de la période allant du baroque tardif au classicisme viennois.",
+    difficulty: "difficile",
+    keepOptionsOrder: true // les propositions contiennent les dates et suivent un ordre logique
+  }
+];
+
+const DIFFICULTY_LABELS = {
+  facile: { label: "Facile", color: "#7cb342", icon: "🎵" },
+  moyen: { label: "Moyen", color: "#e8c47a", icon: "🎶" },
+  difficile: { label: "Difficile", color: "#cd5c5c", icon: "🎺" }
+};
+
+const DIFF_CHOICES = [
+  { value: "tous", label: "🎼 Tous niveaux" },
+  { value: "facile", label: "🎵 Facile" },
+  { value: "moyen", label: "🎶 Moyen" },
+  { value: "difficile", label: "🎺 Difficile" }
+];
+
+const COUNT_CHOICES = [5, 10, 15, 20, 0]; // 0 = toutes les questions
+
+// ─── State ───
+let phase = "welcome";
+let currentIndex = 0;
+let selectedOption = null;
+let showExplanation = false;
+let score = 0;
+let shuffledQuestions = [];
+let selectedDifficulty = "tous";
+let selectedCount = 0; // 0 = toutes
+
+const LETTERS = ["A", "B", "C", "D"];
+
+function availableQuestions() {
+  return selectedDifficulty === "tous"
+    ? QUESTIONS
+    : QUESTIONS.filter(q => q.difficulty === selectedDifficulty);
+}
+
+function getResultData(score, total) {
+  const pct = (score / total) * 100;
+  if (pct === 100) return { emoji: "🏆", title: "Maestro !", message: "Bravissimo — vous connaissez le répertoire sur le bout des doigts, du baroque au XXe siècle.", color: "#e8c47a" };
+  if (pct >= 80) return { emoji: "🎻", title: "Virtuose !", message: "Une culture musicale impressionnante. Quelques mesures à retravailler pour le concert parfait.", color: "#d4a373" };
+  if (pct >= 60) return { emoji: "🎼", title: "Bon concert !", message: "Vous maîtrisez les grandes œuvres. Le récital continue — retournez quelques partitions.", color: "#7cb342" };
+  if (pct >= 40) return { emoji: "🎹", title: "En rodage…", message: "Les bases sont là, mais l'orchestre a besoin de répétitions. Relancez le quizz !", color: "#cd5c5c" };
+  return { emoji: "🤔", title: "Fausse note !", message: "L'histoire des compositeurs réserve bien des surprises. Une deuxième écoute s'impose.", color: "#cd5c5c" };
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Mélange les options d'une question et recalcule l'index de la bonne réponse.
+// Sauf si l'ordre des propositions est logique (ex : ordre chronologique),
+// auquel cas on conserve l'ordre d'origine (flag keepOptionsOrder).
+function prepareQuestion(q) {
+  if (q.keepOptionsOrder) return { ...q };
+  const correctText = q.options[q.correctIndex];
+  const options = shuffle(q.options);
+  return { ...q, options, correctIndex: options.indexOf(correctText) };
+}
+
+function startQuiz() {
+  const pool = shuffle(availableQuestions()).map(prepareQuestion);
+  shuffledQuestions = (selectedCount > 0) ? pool.slice(0, selectedCount) : pool;
+  if (shuffledQuestions.length === 0) return;
+  phase = "playing";
+  currentIndex = 0;
+  selectedOption = null;
+  showExplanation = false;
+  score = 0;
+  render();
+}
+
+function handleSelectDifficulty(value) {
+  selectedDifficulty = value;
+  const avail = availableQuestions().length;
+  if (selectedCount > avail) selectedCount = 0;
+  render();
+}
+
+function handleSelectCount(value) {
+  selectedCount = value;
+  render();
+}
+
+function handleSelectOption(idx) {
+  if (selectedOption !== null) return;
+  selectedOption = idx;
+  const q = shuffledQuestions[currentIndex];
+  if (idx === q.correctIndex) score++;
+  showExplanation = true;
+  render();
+}
+
+function handleNext() {
+  if (currentIndex + 1 >= shuffledQuestions.length) {
+    phase = "result";
+  } else {
+    currentIndex++;
+    selectedOption = null;
+    showExplanation = false;
+  }
+  render();
+}
+
+function restart() {
+  phase = "welcome";
+  render();
+}
+
+function esc(s) {
+  return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+}
+
+function render() {
+  const root = document.getElementById("root");
+  
+  if (phase === "welcome") {
+    const avail = availableQuestions().length;
+    const finalCount = (selectedCount > 0) ? Math.min(selectedCount, avail) : avail;
+    
+    const diffBtns = DIFF_CHOICES.map(d => {
+      const sel = selectedDifficulty === d.value ? "selected" : "";
+      const n = d.value === "tous" ? QUESTIONS.length : QUESTIONS.filter(q => q.difficulty === d.value).length;
+      return `<button class="choice-btn ${sel}" data-diff="${d.value}">${d.label} <small style="opacity:0.6">(${n})</small></button>`;
+    }).join("");
+    
+    const countBtns = COUNT_CHOICES.map(n => {
+      const value = n;
+      const label = n === 0 ? `Toutes (${avail})` : String(n);
+      const disabled = n > avail ? "disabled" : "";
+      const sel = selectedCount === value ? "selected" : "";
+      return `<button class="choice-btn ${sel}" data-count="${value}" ${disabled}>${label}</button>`;
+    }).join("");
+    
+    root.innerHTML = `
+      <div class="quiz-container">
+        <div class="welcome-screen">
+          <div class="welcome-icon">🎼</div>
+          <h1>Quizz — Les compositeurs<br>de musique classique</h1>
+          <p>De Bach à Messiaen, de Vivaldi à Gershwin : testez vos connaissances sur les grands compositeurs et leurs œuvres, du baroque au XXe siècle.</p>
+          <div class="setup-box">
+            <div class="setup-section">
+              <span class="setup-label">🎵 Niveau</span>
+              <div class="choice-row">${diffBtns}</div>
+            </div>
+            <div class="setup-section">
+              <span class="setup-label">🔢 Nombre de questions</span>
+              <div class="choice-row">${countBtns}</div>
+            </div>
+          </div>
+          <p style="font-size:0.9rem;color:#a08d76">${finalCount} question${finalCount > 1 ? "s" : ""} · ~${Math.max(1, Math.ceil(finalCount * 0.35))} minute${finalCount * 0.35 > 1 ? "s" : ""}</p>
+          <button class="start-btn" id="start-btn">▶ Lever le rideau</button>
+        </div>
+      </div>`;
+    
+    document.querySelectorAll(".choice-btn[data-diff]").forEach(btn => {
+      btn.addEventListener("click", () => handleSelectDifficulty(btn.dataset.diff));
+    });
+    document.querySelectorAll(".choice-btn[data-count]").forEach(btn => {
+      btn.addEventListener("click", () => handleSelectCount(parseInt(btn.dataset.count)));
+    });
+    document.getElementById("start-btn").addEventListener("click", startQuiz);
+    return;
+  }
+  
+  if (phase === "result") {
+    const total = shuffledQuestions.length;
+    const result = getResultData(score, total);
+    const wrongCount = total - score;
+    root.innerHTML = `
+      <div class="quiz-container">
+        <div class="result-screen">
+          <div class="result-emoji">${result.emoji}</div>
+          <h2>${result.title}</h2>
+          <div class="score-circle" style="border-color:${result.color};box-shadow:0 0 40px ${result.color}33">
+            <span class="score-num" style="color:${result.color}">${score}</span>
+            <span class="score-denom" style="color:${result.color}">/ ${total}</span>
+          </div>
+          <p class="result-message">${result.message}</p>
+          <div class="result-details">
+            <div class="result-stat"><div class="stat-num" style="color:#7cb342">${score}</div><div class="stat-label">Justes</div></div>
+            <div class="result-stat"><div class="stat-num" style="color:#cd5c5c">${wrongCount}</div><div class="stat-label">Fausses</div></div>
+            <div class="result-stat"><div class="stat-num" style="color:#e8c47a">${Math.round((score/total)*100)}%</div><div class="stat-label">Score</div></div>
+          </div>
+          <button class="restart-btn" id="restart-btn">🔄 Rejouer</button>
+        </div>
+      </div>`;
+    document.getElementById("restart-btn").addEventListener("click", restart);
+    return;
+  }
+  
+  // Playing phase
+  const q = shuffledQuestions[currentIndex];
+  const total = shuffledQuestions.length;
+  const progress = ((currentIndex + (showExplanation ? 1 : 0)) / total) * 100;
+  const diff = DIFFICULTY_LABELS[q.difficulty];
+  
+  let optionsHtml = q.options.map((opt, idx) => {
+    let cls = "option-btn";
+    if (selectedOption !== null) {
+      if (idx === q.correctIndex) cls += " selected-correct";
+      else if (idx === selectedOption) cls += " selected-wrong";
+    }
+    return `<button class="${cls}" data-idx="${idx}" ${selectedOption !== null ? "disabled" : ""}>
+      <span class="option-letter">${LETTERS[idx]}</span>${esc(opt)}
+    </button>`;
+  }).join("");
+  
+  let explanationHtml = "";
+  if (showExplanation) {
+    explanationHtml = `<div class="explanation-box"><div class="expl-label">💡 Le saviez-vous ?</div><p>${esc(q.explanation)}</p></div>`;
+  }
+  
+  let nextHtml = "";
+  if (showExplanation) {
+    nextHtml = `<button class="next-btn" id="next-btn">${currentIndex + 1 >= total ? "Voir les résultats →" : "Question suivante →"}</button>`;
+  }
+  
+  root.innerHTML = `
+    <div class="quiz-container">
+      <div class="progress-bar-wrap">
+        <div class="progress-info">
+          <span>Question ${currentIndex + 1} / ${total}</span>
+          <span>Score : ${score}</span>
+        </div>
+        <div class="progress-track"><div class="progress-fill" style="width:${progress}%"></div></div>
+      </div>
+      <div class="question-card">
+        <div class="question-header">
+          <span class="q-number">Q${currentIndex + 1}</span>
+          <span class="q-difficulty" style="color:${diff.color};border-color:${diff.color}55;background:${diff.color}14">${diff.icon} ${diff.label}</span>
+        </div>
+        <p class="question-text">${esc(q.question)}</p>
+        <div class="options-list">${optionsHtml}</div>
+        ${explanationHtml}
+        ${nextHtml}
+      </div>
+    </div>`;
+  
+  // Wire up option buttons
+  if (selectedOption === null) {
+    document.querySelectorAll(".option-btn").forEach(btn => {
+      btn.addEventListener("click", () => handleSelectOption(parseInt(btn.dataset.idx)));
+    });
+  }
+  
+  if (showExplanation) {
+    document.getElementById("next-btn").addEventListener("click", handleNext);
+  }
+}
+
+// Initial render
+render();
+
+</script>
+</body>
+</html>
